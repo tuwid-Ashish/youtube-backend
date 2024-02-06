@@ -5,14 +5,14 @@ export const asyncHandler=(requestHandler)=>{
 }
 
 
-const asyncHandlertrycatch =(fn)=> async (req,res,next)=>{
- try {
-    await fn(eq,res,next)
- } catch (error) {
-    res.status(error.code || 500).json({
-        success:false,
-        message: error.message
-    })
+// const asyncHandlertrycatch =(fn)=> async (req,res,next)=>{
+//  try {
+//     await fn(eq,res,next)
+//  } catch (error) {
+//     res.status(error.code || 500).json({
+//         success:false,
+//         message: error.message
+//     })
 
- }
-}
+//  }
+// }
