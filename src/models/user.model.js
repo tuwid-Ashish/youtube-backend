@@ -1,7 +1,7 @@
 import mongoose, { Schema } from "mongoose";
 import jwt from "jsonwebtoken";
 import bycrpt from "bcrypt";
-import { JsonWebTokenError } from "jsonwebtoken";
+// import { JsonWebTokenError } from "jsonwebtoken";
 const userschema = new Schema(
   {
     username: {
@@ -49,7 +49,7 @@ const userschema = new Schema(
 
 userschema.pre("save", async function (next) {
   if (!this.isModified("password")) return next();
-  this.password = bycrpt.hash(this.password, 10);
+  this.password = await bycrpt.hash(this.password, 10);
   next();
 });
 
