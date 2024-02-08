@@ -24,7 +24,7 @@ const userschema = new Schema(
     },
     password: {
       type: String,
-      required: [true, "Password is reqiured"],
+      required: [ true, "Password is reqiured"],
     },
     avatar: {
       type: String, // cloudinary url
@@ -35,14 +35,11 @@ const userschema = new Schema(
     refreshtoken: {
       type: String,
     },
-    // user_details:{
-    //     type: Schema.Types.ObjectId,
-    //     ref:"UserDetail",
-    // }
-    watchHistory: {
+    watchHistory:[ {
       type: Schema.Types.ObjectId,
-      ref: "UserDetail",
-    },
+      ref: "Video",
+    }]
+
   },
   { timestamps: true },
 );

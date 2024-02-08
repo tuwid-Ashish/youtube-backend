@@ -24,8 +24,10 @@ export const registeruser = asyncHandler(async (req, res, next) => {
     throw new ApiError(400, "field can not be empty");
   }
   // more validation can be added
+  console.log("My password field is : ", password, fullname, username);
+
   const userexist = await User.findOne({
-    $or: [email, username],
+    $or: [{ email }, { username }],
   });
 
   if (userexist) {
@@ -34,9 +36,18 @@ export const registeruser = asyncHandler(async (req, res, next) => {
       "the user is already exist with this email or username",
     );
   }
-  console.log(req.files);
-  const avtarlocalpath = req.files?.avatar[0]?.path;
-  const coverImagelocalpath = req.files?.coverImage[0]?.path;
+  console.log("this is just req files checking", req.files);
+  const avtarlocalpath = req.files?.avtar[0]?.path;
+  // const coverImagelocalpath = req.files?.coverImage[0]?.path;
+  let coverImagelocalpath;
+  if (
+    req.files &&
+    Array.isArray(req.files.coverImage) &&
+    req.files.coverImage.length > 0
+  ) {
+    coverImagelocalpath = req.files.coverImage[0].path;
+  }
+
   if (!avtarlocalpath) {
     throw new ApiError(
       500,
@@ -55,16 +66,16 @@ export const registeruser = asyncHandler(async (req, res, next) => {
   }
 
   const user = await User.create({
+    username,
+    email,
     fullname,
+    password,
     avatar: avataruploaded.url,
     coverImage: coverImageuploaded?.url || "",
-    email,
-    password,
-    username,
   });
-  const checkeduser = await User.findById(user._id).select([
+  const checkeduser = await User.findById(user._id).select(
     "-password -refeshtoken",
-  ]);
+  );
 
   if (!checkeduser) {
     throw new ApiError(
