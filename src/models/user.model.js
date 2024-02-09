@@ -56,27 +56,27 @@ userschema.methods.isPasswordCorrect = async function(password){
 
 }
 userschema.methods.Jwt_access_token = function(){
-  jwt.sign(
+  return jwt.sign(
     {
-       _id : this._id,
-       fullname :this.fullname,
-       email:this.email,
-       username:this.username,
+      _id : this._id,
+      fullname :this.fullname,
+      email:this.email,
+      username:this.username,
     },
     process.env.JWT_ACCESS_TOKENT_SECRET,
-   {
-    expiresIn:JWT_ACCESS_TOKENT_EXPIREY_DATE
-   }
-  )
+    {
+      expiresIn:process.env.JWT_ACCESS_TOKENT_EXPIREY_DATE
+    }
+    )
 }
 userschema.methods.Jwt_refresh_token = function(){
-  jwt.sign(
+  return jwt.sign(
     {
        _id : this._id,
     },
     process.env.JWT_REFRESH_TOKENT_SECRET,
    {
-    expiresIn:JWT_REFRESH_TOKENT_EXPIREY_DATE
+    expiresIn:process.env.JWT_REFRESH_TOKENT_EXPIREY_DATE
    }
   )
 }
