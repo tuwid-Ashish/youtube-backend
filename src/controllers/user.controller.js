@@ -3,6 +3,12 @@ import { ApiError } from "../utils/ApiError.js";
 import { User } from "../models/user.model.js";
 import { uploadOncloudinary } from "../utils/Cloudinary.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
+import jwt from "jsonwebtoken";
+import jwt from "jsonwebtoken";
+const options = {
+  httpOnly: true,
+  secure: true,
+};
 
 const genrateAccesandRefreshToken = async (userid) => {
   try {
@@ -209,4 +215,53 @@ const logoutUser = asyncHandler(async (req, res) => {
     .clearCookie("refreshtoken", options)
     .json(new ApiResponse(200, {}, "User logged out successfully"));
 });
-export { registeruser, loginUser, logoutUser };
+
+const refreshaccessToken = asyncHandler(async (req, res) => {
+  try {
+    const incomingRefreshtoken =
+      req.cookies.refreshtoken || req.body.refreshtoken;
+
+    if (!incomingRefreshtoken) {
+      throw new ApiError(401, "unauthorized request");
+    }
+    const decodedtoken = jwt.verify(
+      incomingRefreshtoken,
+      process.env.JWT_REFRESH_TOKENT_SECRET,
+    );
+
+    if (!decodedtoken) {
+      throw new ApiError(401, "invalid refresh token");
+    }
+    const user = await User.findById(decodedtoken?._id);
+    if (!user) {
+      throw new ApiError(401, "user not found");
+    }
+
+    const dbrefreshtoken = user?.refreshtoken;
+
+    if (dbrefreshtoken !== decodedtoken) {
+      throw new ApiError(401, "invalid refresh token");
+    }
+    const { NewRefreshtoken, accesstoken } = await genrateAccesandRefreshToken(
+      user._id,
+    );
+
+    res
+      .status(200)
+      .cookies("refreshtoken", NewRefreshtoken, options)
+      .cookies("accesstoken", accesstoken, options)
+      .json(
+        new ApiResponse(
+          200,
+          {
+            accesstoken,
+            refreshtoken: NewRefreshtoken,
+          },
+          "Acess token refresh",
+        ),
+      );
+  } catch (error) {
+    throw new ApiError(401,error.message|| "Invalid refresh token")
+  }
+});
+export { registeruser, loginUser, logoutUser, refreshaccessToken };
